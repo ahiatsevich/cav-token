@@ -1,0 +1,28 @@
+{
+  "name": "cav-platform",
+  "version": "1.0.0",
+  "description": "CAV Asset and Platform",
+  "main": "CAVPlatform.sol",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "TODO"
+  },
+  "keywords": [
+    "CAV",
+    "erc20"
+  ],
+  "author": "CAV Dev Team",
+  "license": "MIT",
+  "dependencies": {
+    "ethereumjs-testrpc": "6.0.3",
+    "truffle": "4.0.6",
+    "truffle-hdwallet-provider": "^0.0.3",
+    "abi-decoder": "^1.0.9"
+  }
+}
