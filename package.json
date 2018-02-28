@@ -7,7 +7,17 @@
     "test": "test"
   },
   "scripts": {
-    "test": "truffle test"
+    "test": "truffle test",
+    "win:test": "node node_modules\\truffle\\build\\cli.bundled.js test test\\xentoken\\*",
+    "win:test:all": "node node_modules\\truffle\\build\\cli.bundled.js test",
+    "win:compile": "node node_modules\\truffle\\build\\cli.bundled.js compile",
+    "win:compile:all": "node node_modules\\truffle\\build\\cli.bundled.js compile --all",
+    "win:migrate": "node node_modules\\truffle\\build\\cli.bundled.js migrate",
+    "win:migrate:reset": "node node_modules\\truffle\\build\\cli.bundled.js migrate --reset",
+    "win:testrpc": "node node_modules\\ethereumjs-testrpc\\build\\cli.node.js --mnemonic \"video visa alcohol fault earth naive army senior major inherit convince electric\" --trace_request true",
+    "win:console:dev": "node node_modules\\truffle\\build\\cli.bundled.js console --network development",
+    "win:console:rinkeby": "node node_modules\\truffle\\build\\cli.bundled.js console --network rinkeby",
+    "win:console:main": "node node_modules\\truffle\\build\\cli.bundled.js console --network main"
   },
   "repository": {
     "type": "git",
@@ -22,7 +32,7 @@
   "dependencies": {
     "ethereumjs-testrpc": "6.0.3",
     "truffle": "4.0.6",
-    "truffle-hdwallet-provider": "^0.0.3",
+    "truffle-hdwallet-provider": "mikefluff/truffle-hdwallet-provider",
     "abi-decoder": "^1.0.9"
   }
 }
