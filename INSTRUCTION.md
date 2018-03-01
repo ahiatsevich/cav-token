@@ -26,3 +26,28 @@ To correct/update an amount of token supply, number of digits after the point an
 Continue working in opened console:
 - to check your balance of this token `CAVAssetProxy.deployed().then(t => t.balanceOf.call("your address here"))`
 - transfer tokens to other addresses `CAVAssetProxy.deployed().then(t => t.transfer("destination address", 1000)` where `1000` - number of tokens you want to send
+
+## Blacklist
+
+```
+const tokenHolder = ...;
+
+let asset = await CAVAsset.deployed();
+
+// restriction
+await asset.restrict([tokenHolder]);
+
+// unrestriction
+await asset.unrestrict([tokenHolder]);
+
+```
+
+## Pause / Unpause
+
+```
+let asset = await CAVAsset.deployed();
+
+await asset.pause();
+
+await asset.unpause();
+```
