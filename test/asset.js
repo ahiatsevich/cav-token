@@ -12,7 +12,7 @@ contract('ChronoBankAsset', function(accounts) {
   afterEach('revert', reverter.revert);
 
   var UINT_256_MINUS_1 = '1.15792089237316195423570985008687907853269984665640564039457584007913129639935e+77';
-  var SYMBOL = 'TIME';
+  var SYMBOL = 'TIME1';
   var SYMBOL2 = 'LHT';
   var NAME = 'Test Name';
   var DESCRIPTION = 'Test Description';
@@ -1189,29 +1189,53 @@ contract('ChronoBankAsset', function(accounts) {
     assert.isFalse(await chronoBankAsset.paused());
   });
 
-
-  it('should be not be possible to transfer if stoped', async() => {
+  it('should be possible to transfer if stoped by owner', async() => {
     await chronoBankPlatform.setProxy(chronoBankAssetProxy.address, SYMBOL);
 
-    const holder = accounts[1];
-    const balance = 100;
+    const owner = accounts[0];
+    const holder1 = accounts[1];
+    const balance = 10;
 
     await chronoBankAsset.pause();
     assert.isTrue(await chronoBankAsset.paused());
 
-    assert.isFalse(await chronoBankAssetProxy.transfer.call(holder, balance));
+    assert.isTrue(await chronoBankAssetProxy.transfer.call(holder1, balance, {from: owner}));
 
-    let expectedBalance = await chronoBankAssetProxy.balanceOf(holder);
+    let expectedBalance = await chronoBankAssetProxy.balanceOf(holder1);
 
-    result = await chronoBankAssetProxy.transfer(holder, balance);
+    await chronoBankAssetProxy.transfer(holder1, balance, {from: owner});
 
-    let actualBalance = await chronoBankAssetProxy.balanceOf(holder);
+    let actualBalance = await chronoBankAssetProxy.balanceOf(holder1);
+    assert.equal(expectedBalance.add(balance).valueOf(), actualBalance.valueOf());
+  });
+
+  it('should be not be possible to transfer if stoped', async() => {
+    await chronoBankPlatform.setProxy(chronoBankAssetProxy.address, SYMBOL);
+
+    const owner = accounts[0];
+    const holder1 = accounts[1];
+    const holder2 = accounts[2];
+    const balance = 10;
+
+    await chronoBankAssetProxy.transfer(holder1, balance);
+
+    await chronoBankAsset.pause();
+    assert.isTrue(await chronoBankAsset.paused());
+
+    assert.isFalse(await chronoBankAssetProxy.transfer.call(holder2, balance, {from: holder1}));
+    assert.isTrue(await chronoBankAssetProxy.transfer.call(holder2, balance, {from: owner}));
+
+    let expectedBalance = await chronoBankAssetProxy.balanceOf(holder2);
+
+    await chronoBankAssetProxy.transfer(holder2, balance, {from: holder1});
+
+    let actualBalance = await chronoBankAssetProxy.balanceOf(holder2);
     assert.equal(expectedBalance.valueOf(), actualBalance.valueOf());
 
     await chronoBankAsset.unpause();
     assert.isFalse(await chronoBankAsset.paused());
 
-    assert.isTrue(await chronoBankAssetProxy.transfer.call(holder, balance));
+    assert.isTrue(await chronoBankAssetProxy.transfer.call(holder2, balance, {from: holder1}));
   });
 
   it('should be not be possible to transfer if target address in blacklist', async() => {
@@ -1264,6 +1288,36 @@ contract('ChronoBankAsset', function(accounts) {
     assert.isTrue(await chronoBankAssetProxy.transfer.call(holder2, balance, {from: holder}));
   });
 
+  it('should be possible to make transferFrom if stoped by owner', async() => {
+    await chronoBankPlatform.setProxy(chronoBankAssetProxy.address, SYMBOL);
+
+    const owner = accounts[0];
+    const holder = accounts[1];
+    const balance = 10;
+
+    await chronoBankAssetProxy.transfer(holder, balance);
+
+    await chronoBankAsset.pause();
+    assert.isTrue(await chronoBankAsset.paused());
+
+    await chronoBankAssetProxy.approve(owner, balance, {from: holder});
+
+    assert.isTrue(await chronoBankAssetProxy.transferFrom.call(holder, owner, balance, {from: owner}));
+
+    let expectedBalance = await chronoBankAssetProxy.balanceOf(owner);
+    let expectedBalance2 = await chronoBankAssetProxy.balanceOf(holder);
+
+    await chronoBankAssetProxy.transferFrom(holder, owner, balance, {from: owner});
+
+    let actualBalance = await chronoBankAssetProxy.balanceOf(owner);
+    let actualBalance2 = await chronoBankAssetProxy.balanceOf(holder);
+
+    assert.equal(expectedBalance.add(balance).valueOf(), actualBalance.valueOf());
+    assert.equal(expectedBalance2.sub(balance).valueOf(), actualBalance2.valueOf());
+
+    await chronoBankAsset.unpause();
+    assert.isFalse(await chronoBankAsset.paused());
+  });
 
   it('should be not be possible to make transferFrom if stoped', async() => {
     await chronoBankPlatform.setProxy(chronoBankAssetProxy.address, SYMBOL);
@@ -1282,7 +1336,7 @@ contract('ChronoBankAsset', function(accounts) {
     let expectedBalance = await chronoBankAssetProxy.balanceOf(holder);
     let expectedBalance2 = await chronoBankAssetProxy.balanceOf(holder2);
 
-    await chronoBankAssetProxy.transferFrom(holder, holder2, balance);
+    await chronoBankAssetProxy.transferFrom(holder, holder2, balance, {from: holder2});
 
     let actualBalance = await chronoBankAssetProxy.balanceOf(holder);
     let actualBalance2 = await chronoBankAssetProxy.balanceOf(holder2);

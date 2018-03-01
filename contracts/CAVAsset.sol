@@ -33,9 +33,9 @@ contract CAVAsset is CAVAssetInterface {
             _;
         }
     }
-
-    modifier onlyNotPaused() {
-        if (!paused) {
+    
+    modifier onlyNotPaused(address sender) {
+        if (!paused || isAuthorized(sender)) {
             _;
         }
     }
@@ -50,8 +50,7 @@ contract CAVAsset is CAVAssetInterface {
     *  Only assets's admins are allowed to execute
     */
     modifier onlyAuthorized() {
-        CAVPlatform platform = CAVPlatform(proxy.platform());
-        if (platform.hasAssetRights(msg.sender, proxy.smbl())) {
+        if (isAuthorized(msg.sender)) {
             _;
         }
     }
@@ -72,6 +71,11 @@ contract CAVAsset is CAVAssetInterface {
         }
         proxy = _proxy;
         return true;
+    }
+
+    function isAuthorized(address sender) public view returns (bool) {
+        CAVPlatform platform = CAVPlatform(proxy.platform());
+        return platform.hasAssetRights(sender, proxy.smbl());
     }
 
     /**
@@ -133,7 +137,7 @@ contract CAVAsset is CAVAssetInterface {
      */
     function _transferWithReference(address _to, uint _value, string _reference, address _sender)
     internal
-    onlyNotPaused
+    onlyNotPaused(_sender)
     onlyAcceptable(_to)
     onlyAcceptable(_sender)
     returns(bool)
@@ -162,7 +166,7 @@ contract CAVAsset is CAVAssetInterface {
      */
     function _transferFromWithReference(address _from, address _to, uint _value, string _reference, address _sender)
     internal
-    onlyNotPaused
+    onlyNotPaused(_sender)
     onlyAcceptable(_from)
     onlyAcceptable(_to)
     onlyAcceptable(_sender)
