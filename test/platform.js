@@ -2989,4 +2989,88 @@ context("MINT-390 symbols", function(){
     })
 })
 
+context("Mass transfer", function(){
+    it("should transfer tokens to multiple targets", async () => {
+        await chronoBankPlatform.issueAsset(SYMBOL, 100, NAME, DESCRIPTION, BASE_UNIT, IS_REISSUABLE)
+
+        let targets = ["0x1", "0x2", "0x3", "0x4"];
+        let values = ["1", "2", "3", "4"];
+
+        let tx = await chronoBankPlatform.massTransfer(targets, values, SYMBOL);
+
+        let errors = eventsHelper.extractEvents(tx, "Error")
+        assert.equal(errors.length, 0);
+
+        let transfers = eventsHelper.extractEvents(tx, "Transfer")
+        assert.equal(transfers.length, targets.length);
+
+        assert.equal(values[0], await chronoBankPlatform.balanceOf(targets[0], SYMBOL));
+        assert.equal(values[1], await chronoBankPlatform.balanceOf(targets[1], SYMBOL));
+        assert.equal(values[2], await chronoBankPlatform.balanceOf(targets[2], SYMBOL));
+        assert.equal(values[3], await chronoBankPlatform.balanceOf(targets[3], SYMBOL));
+    })
+
+    it("shouldn't transfer tokens to multiple targets if has no enought balance", async () => {
+        await chronoBankPlatform.issueAsset(SYMBOL, 100, NAME, DESCRIPTION, BASE_UNIT, IS_REISSUABLE)
+
+        let targets = ["0x1", "0x2", "0x3", "0x4"];
+        let values = ["101", "2", "3", "4"];
+
+        let result = await chronoBankPlatform.massTransfer.call(targets, values, SYMBOL);
+        assert.equal(result[1], 3); // rest must be transfered
+
+        let tx = await chronoBankPlatform.massTransfer(targets, values, SYMBOL);
+
+        let errors = eventsHelper.extractEvents(tx, "Error")
+        assert.equal(errors.length, 1);
+
+        let transfers = eventsHelper.extractEvents(tx, "Transfer")
+        assert.equal(transfers.length, targets.length - 1);
+
+        assert.equal(0, await chronoBankPlatform.balanceOf(targets[0], SYMBOL));
+        assert.equal(values[1], await chronoBankPlatform.balanceOf(targets[1], SYMBOL));
+        assert.equal(values[2], await chronoBankPlatform.balanceOf(targets[2], SYMBOL));
+        assert.equal(values[3], await chronoBankPlatform.balanceOf(targets[3], SYMBOL));
+    })
+
+    it("shouldn't transfer 0 tokens", async () => {
+        await chronoBankPlatform.issueAsset(SYMBOL, 100, NAME, DESCRIPTION, BASE_UNIT, IS_REISSUABLE)
+
+        let targets = ["0x1"];
+        let values = ["0",];
+
+        let result = await chronoBankPlatform.massTransfer.call(targets, values, SYMBOL);
+        assert.equal(result[1], 0); // nothing should be transfered
+
+        let tx = await chronoBankPlatform.massTransfer(targets, values, SYMBOL);
+
+        let errors = eventsHelper.extractEvents(tx, "Error")
+        assert.equal(errors.length, 1);
+
+        let transfers = eventsHelper.extractEvents(tx, "Transfer")
+        assert.equal(transfers.length, 0);
+
+        assert.equal(0, await chronoBankPlatform.balanceOf(targets[0], SYMBOL));
+    })
+
+    it("shouldn't transfer to oneself", async () => {
+        await chronoBankPlatform.issueAsset(SYMBOL, 100, NAME, DESCRIPTION, BASE_UNIT, IS_REISSUABLE)
+
+        let targets = [accounts[0]];
+        let values = ["0"];
+
+        let result = await chronoBankPlatform.massTransfer.call(targets, values, SYMBOL);
+        assert.equal(result[0], 1);
+        assert.equal(result[1], 0); // nothing should be transfered
+
+        let tx = await chronoBankPlatform.massTransfer(targets, values, SYMBOL);
+
+        let errors = eventsHelper.extractEvents(tx, "Error")
+        assert.equal(errors.length, 1);
+
+        let transfers = eventsHelper.extractEvents(tx, "Transfer")
+        assert.equal(transfers.length, 0);
+    })
+})
+
 })

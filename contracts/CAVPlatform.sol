@@ -611,6 +611,46 @@ contract CAVPlatform is Object, CAVPlatformEmitter {
         return OK;
     }
 
+    function massTransfer(address[] addresses, uint[] values, bytes32 _symbol)
+    external
+    onlyOneOfOwners(_symbol)
+    returns (uint errorCode, uint count)
+    {
+        require(addresses.length == values.length);
+        require(_symbol != 0x0);
+
+        uint senderId = _createHolderId(msg.sender);
+
+        uint success = 0;
+        for(uint idx = 0; idx < addresses.length && msg.gas > 110000; idx++) {
+            uint value = values[idx];
+
+            if (value == 0) {
+              _error(CAV_PLATFORM_INVALID_VALUE);
+              continue;
+            }
+
+            if (_balanceOf(senderId, _symbol) < value) {
+              _error(CAV_PLATFORM_INSUFFICIENT_BALANCE);
+              continue;
+            }
+
+            if (msg.sender == addresses[idx]) {
+              _error(CAV_PLATFORM_CANNOT_APPLY_TO_ONESELF);
+              continue;
+            }
+
+            uint holderId = _createHolderId(addresses[idx]);
+
+            _transferDirect(senderId, holderId, value, _symbol);
+            CAVPlatformEmitter(eventsHistory).emitTransfer(msg.sender, addresses[idx], _symbol, value, "");
+
+            success++;
+          }
+
+          return (OK, success);
+    }
+
     /// Perform recovery procedure.
     ///
     /// This function logic is actually more of an addAccess(uint _holderId, address _to).
