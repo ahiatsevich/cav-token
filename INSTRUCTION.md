@@ -1,7 +1,11 @@
 # How to deploy CAV token [Windows OS]
 
 First of all you have to have Ethereum account address with Ether on it.
-If you have it then you should have wallet file. Copy and paste it into `secret.json`. Do not use default one which is commited right now. Do not share your wallet file and do not commit it in a public repo!
+
+
+
+If you have it then you should have wallet file. Copy and paste it into `secret.json`.
+*Important!* Do not use default one which is commited right now. Do not share your wallet file and do not commit it in a public repo!
 
 To correct/update an amount of token supply, number of digits after the point and other parameters go to `migrations/3_deploy_assetproxy.js`)
 
@@ -29,6 +33,8 @@ Continue working in opened console:
 
 ## Blacklist
 
+Start truffle console, then:
+
 ```
 const tokenHolder = ...;
 
@@ -43,6 +49,8 @@ await asset.unrestrict([tokenHolder]);
 ```
 
 ## Pause / Unpause
+
+Start truffle console, then:
 
 ```
 let asset = await CAVAsset.deployed();
