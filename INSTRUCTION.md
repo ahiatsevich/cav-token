@@ -2,10 +2,17 @@
 
 First of all you have to have Ethereum account address with Ether on it.
 
+If you have it then you should have wallet file (with a password). Copy and paste it into `secret.json`, also change the `password` in section `main` in truffle.js to correct one:
 
-
-If you have it then you should have wallet file. Copy and paste it into `secret.json`.
-*Important!* Do not use default one which is commited right now. Do not share your wallet file and do not commit it in a public repo!
+```
+main: {
+    network_id: 1,
+    provider: new HDWalletProvider(getWallet(), "password", 'https://mainnet.infura.io/'),
+    gas: 4700000,
+    gasPrice: 1000000000
+},
+```
+*Important!* Do not use the wallet file and password which are in the repo now! Do not share your wallet file and do not commit it in a public repo!
 
 To correct/update an amount of token supply, number of digits after the point and other parameters go to `migrations/3_deploy_assetproxy.js`)
 
