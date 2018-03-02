@@ -31,7 +31,8 @@ To correct/update an amount of token supply, number of digits after the point an
 6. In appeared console input enter `migrate`. Now just waiting.
         Project directory now contains `build` folder with artifacts and info about deployed contracts
 7. After migration step enter the next command: `CAVAssetProxy.address`. It will show the address of token. You could look at it either in [rinkeby](https://rinkeby.etherscan.io) (if you run console with `win:console:rinkeby`) or [main](https://etherscan.io) (if you run console with `win:console:main`) explorer.
-8. Now you are able to send/receive tokens to other addresses.
+8. Save (or commit in a repo) artifacts which has been updated after migration in /build folder for further usage!
+9. Now you are able to send/receive tokens to other addresses.
 
 ## Afterwards
 Continue working in opened console:
