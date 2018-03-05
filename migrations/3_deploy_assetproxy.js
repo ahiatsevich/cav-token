@@ -4,8 +4,8 @@ const CAVPlatform = artifacts.require("./CAVPlatform.sol");
 module.exports = async (deployer, network) => {
     deployer.then(async () => {
         const SYMBOL = 'CAV';
-        const NAME = 'CAV Token';
-        const DESCRIPTION = 'CAV Token';
+        const NAME = 'Caviar';
+        const DESCRIPTION = 'Caviar Token';
 
         const BASE_UNIT = 18;
         const IS_REISSUABLE = false;
