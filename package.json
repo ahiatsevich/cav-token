@@ -31,8 +31,8 @@
   "license": "MIT",
   "dependencies": {
     "ethereumjs-testrpc": "6.0.3",
-    "truffle": "4.0.6",
-    "truffle-hdwallet-provider": "mikefluff/truffle-hdwallet-provider",
+    "truffle": "4.1.0",
+    "truffle-hdwallet-provider": "mikefluff/truffle-hdwallet-provider#7a2eccca1ba17c235a3ef258914ca74ea5f13014",
     "abi-decoder": "^1.0.9"
   }
 }
